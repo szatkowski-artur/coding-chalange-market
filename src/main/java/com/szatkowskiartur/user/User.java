@@ -8,6 +8,7 @@ import org.hibernate.annotations.Cascade;
 import org.springframework.lang.Nullable;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -30,14 +31,14 @@ public class User {
     private String email;
 
     @Column (nullable = false)
-    private Date birthday;
+    private LocalDate birthday;
 
     @Column (nullable = false)
     @ToString.Exclude
     private String password;
 
-    @OneToOne (fetch = FetchType.LAZY, mappedBy = "owner")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToOne (fetch = FetchType.LAZY)
+    @Cascade({org.hibernate.annotations.CascadeType.ALL, })
     @ToString.Exclude
     private Portfolio portfolio;
 

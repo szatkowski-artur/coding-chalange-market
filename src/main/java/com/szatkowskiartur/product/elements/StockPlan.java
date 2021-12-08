@@ -1,8 +1,21 @@
 package com.szatkowskiartur.product.elements;
 
-public class StockPlan implements Plan{
+import org.springframework.http.ResponseEntity;
+
+import java.util.Optional;
+
+public class StockPlan implements Plan {
+
     @Override
-    public Float getPrice(String symbol) {
+    public Optional<Float> getProductPrice(String symbol) {
         return null;
+    }
+
+
+
+
+    @Override
+    public boolean checkIfResponseCorrect(ResponseEntity<String> response) {
+        return false;
     }
 }

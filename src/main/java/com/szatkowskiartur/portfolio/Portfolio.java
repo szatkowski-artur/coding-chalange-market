@@ -18,7 +18,6 @@ public class Portfolio {
     private Long id;
 
     @OneToOne
-    @Column (nullable = false)
     private User owner;
 
     @OneToMany (fetch = FetchType.EAGER, mappedBy = "portfolio")
@@ -27,8 +26,25 @@ public class Portfolio {
 
     //todo Check if sums correctly, might not give zero value
     @Transient
-    private Double totalValue = products.stream()
-            .mapToDouble(entry -> entry.getProduct().getValue() * entry.getAmount())
-            .sum();
+    private Double totalValue;
 
+
+    public Portfolio(Long id, User owner, List<PortfolioEntry> products) {
+        this.id = id;
+        this.owner = owner;
+        this.products = products;
+        this.totalValue = products.stream()
+                .mapToDouble(entry -> entry.getProduct().getValueUsd() * entry.getAmount())
+                .sum();
+    }
+
+    public Portfolio(User owner) {
+        this.owner = owner;
+    }
+
+
+
+    public Portfolio() {
+
+    }
 }

@@ -14,9 +14,9 @@ public class ChoosePlanFactory {
 
             switch (type) {
                 case "COIN":
-                    CoinPlan.class.getDeclaredConstructor().newInstance();
+                    return CoinPlan.class.getDeclaredConstructor().newInstance();
                 case "STOCK":
-                    StockPlan.class.getDeclaredConstructor().newInstance();
+                    return StockPlan.class.getDeclaredConstructor().newInstance();
                 default:
                     return null;
             }
