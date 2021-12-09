@@ -37,10 +37,12 @@ public class User {
     @ToString.Exclude
     private String password;
 
-    @OneToOne (fetch = FetchType.LAZY)
-    @Cascade({org.hibernate.annotations.CascadeType.ALL, })
-    @ToString.Exclude
-    private Portfolio portfolio;
+//    @OneToOne (fetch = FetchType.LAZY, mappedBy = "owner")
+//    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+//    @ToString.Exclude
+//    private Portfolio portfolio;
 
+    @Column (nullable = false)
+    private Boolean active;
 
 }

@@ -1,5 +1,8 @@
-package com.szatkowskiartur.portfolio;
+package com.szatkowskiartur.portfolio_entry;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.szatkowskiartur.portfolio.Portfolio;
 import com.szatkowskiartur.product.Product;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -16,8 +19,9 @@ public class PortfolioEntry {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn (name = "portfolio_id")
+    @JsonIgnore
     private Portfolio portfolio;
 
     @ManyToOne (fetch = FetchType.EAGER)
@@ -25,5 +29,6 @@ public class PortfolioEntry {
     private Product product;
 
     private Float amount;
+
 
 }

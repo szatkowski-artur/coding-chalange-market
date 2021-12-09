@@ -1,5 +1,6 @@
 package com.szatkowskiartur.portfolio;
 
+import com.szatkowskiartur.portfolio_entry.PortfolioEntry;
 import com.szatkowskiartur.user.User;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,23 +11,27 @@ import java.util.List;
 
 @Entity
 @Data
-@EqualsAndHashCode (of = "id")
+@EqualsAndHashCode(of = "id")
 public class Portfolio {
 
     @Id
-    @GeneratedValue (strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private User owner;
 
-    @OneToMany (fetch = FetchType.EAGER, mappedBy = "portfolio")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "portfolio", cascade = CascadeType.REMOVE)
+//    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     private List<PortfolioEntry> products;
 
-    //todo Check if sums correctly, might not give zero value
+    private Double creditUsd = 0.0;
+
     @Transient
-    private Double totalValue;
+    private Double totalValue = 0.0;
+
+
 
 
     public Portfolio(Long id, User owner, List<PortfolioEntry> products) {
@@ -38,9 +43,13 @@ public class Portfolio {
                 .sum();
     }
 
+
+
+
     public Portfolio(User owner) {
         this.owner = owner;
     }
+
 
 
 

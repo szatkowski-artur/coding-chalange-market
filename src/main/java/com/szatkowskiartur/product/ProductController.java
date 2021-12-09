@@ -1,19 +1,21 @@
 package com.szatkowskiartur.product;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.szatkowskiartur.exception.CoinMetricsApiUnavailable;
 import com.szatkowskiartur.exception.NotFoundException;
+
+import static com.szatkowskiartur.utlis.Utils.*;
+
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("product")
@@ -21,6 +23,7 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final ProductServiceImpl productService;
+    private final ModelMapper mapper;
 
 
 
@@ -36,41 +39,45 @@ public class ProductController {
 
 
     @GetMapping("/metrics")
-    public ResponseEntity<List<Product>> getAllProductsMetrics() {
-        return new ResponseEntity<>(productService.getAllProducts(), HttpStatus.OK);
+    public ResponseEntity<List<ProductDTO>> getAllProductsMetrics() {
+
+        List<ProductDTO> products = new ArrayList<>();
+        mapper.map(productService.getAllProducts(), products);
+
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
 
 
 
     @GetMapping("/{symbol}/metrics")
-    public ResponseEntity<Product> getProductMetricsBySymbol(@PathVariable String symbol) {
+    public ResponseEntity<ProductDTO> getProductMetricsById(@PathVariable String symbol) {
 
         Optional<Product> productDatabase = productService.getProductMetricsBySymbol(symbol.toUpperCase());
         if (productDatabase.isEmpty())
             throw new NotFoundException("Product with given symbol does not exist");
 
-        return new ResponseEntity<>(productDatabase.get(), HttpStatus.FOUND);
+        return new ResponseEntity<>(mapper.map(productDatabase.get(), ProductDTO.class), HttpStatus.FOUND);
     }
 
 
 
 
     @GetMapping("/id/{id}/metrics")
-    public ResponseEntity<Product> getProductMetricsBySymbol(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductMetricsById(@PathVariable Long id) {
 
         Optional<Product> productDatabase = productService.getProductById(id);
         if (productDatabase.isEmpty())
             throw new NotFoundException("Product with given id does not exist");
 
-        return new ResponseEntity<>(productDatabase.get(), HttpStatus.OK);
+        return new ResponseEntity<>(mapper.map(productDatabase.get(), ProductDTO.class), HttpStatus.OK);
     }
 
 
 
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity handleNotFoundException(NotFoundException exception) {
+    public ResponseEntity<String> handleNotFoundException(NotFoundException exception) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -82,24 +89,11 @@ public class ProductController {
 
 
     @ExceptionHandler(CoinMetricsApiUnavailable.class)
-    public ResponseEntity handleCoinMetricsApiUnavailable(CoinMetricsApiUnavailable exception) {
+    public ResponseEntity<String> handleCoinMetricsApiUnavailable(CoinMetricsApiUnavailable exception) {
 
         return ResponseEntity
                 .status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(createJsonWithMessage("Coin metrics service is currently unavailable"));
-    }
-
-
-
-
-    @SneakyThrows
-    private String createJsonWithMessage(String message) {
-
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectNode root = mapper.createObjectNode();
-        root.put("message", message);
-
-        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
     }
 
 
