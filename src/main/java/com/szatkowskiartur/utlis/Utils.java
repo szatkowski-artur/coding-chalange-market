@@ -16,4 +16,8 @@ public class Utils {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
     }
 
+    public static Double roundToTwoDecimalPlaces (Double number) {
+        return Math.round(number * 100.0) / 100.0;
+    }
+
 }

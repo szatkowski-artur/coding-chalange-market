@@ -1,9 +1,13 @@
 package com.szatkowskiartur.portfolio;
 
+import com.szatkowskiartur.exception.CoinMetricsApiUnavailable;
 import com.szatkowskiartur.portfolio_entry.PortfolioEntry;
+import com.szatkowskiartur.product.Product;
 import com.szatkowskiartur.user.User;
+import com.szatkowskiartur.utlis.Utils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
@@ -11,18 +15,19 @@ import java.util.List;
 
 @Entity
 @Data
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode (of = "id")
+@ToString (of = "id")
 public class Portfolio {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue (strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @OneToOne (fetch = FetchType.LAZY)
+    @JoinColumn (name = "user_id")
     private User owner;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "portfolio", cascade = CascadeType.REMOVE)
+    @OneToMany (fetch = FetchType.EAGER, mappedBy = "portfolio", cascade = CascadeType.REMOVE)
 //    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     private List<PortfolioEntry> products;
 
@@ -34,26 +39,47 @@ public class Portfolio {
 
 
 
-    public Portfolio(Long id, User owner, List<PortfolioEntry> products) {
+    public Portfolio (Long id, User owner, List<PortfolioEntry> products) {
         this.id = id;
         this.owner = owner;
         this.products = products;
-        this.totalValue = products.stream()
-                .mapToDouble(entry -> entry.getProduct().getValueUsd() * entry.getAmount())
-                .sum();
+        setTotalValue();
     }
 
 
 
 
-    public Portfolio(User owner) {
+    @PostLoad
+    public void setTotalValue () {
+
+        Double sum = products.stream()
+                .mapToDouble(entry -> {
+
+                    Product product = entry.getProduct();
+
+                    try {
+                        product.setValueUsd();
+                    } catch (CoinMetricsApiUnavailable e) {
+                        e.printStackTrace();
+                    }
+
+                    return product.getValueUsd() * entry.getAmount();
+                })
+                .sum();
+
+        totalValue = Utils.roundToTwoDecimalPlaces(sum);
+    }
+
+
+
+
+    public Portfolio (User owner) {
         this.owner = owner;
     }
 
 
 
 
-    public Portfolio() {
-
+    public Portfolio () {
     }
 }

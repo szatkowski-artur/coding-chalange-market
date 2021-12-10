@@ -15,6 +15,15 @@ public class UserServiceImpl implements UserService {
     private final PortfolioRepository portfolioRepository;
 
 
+
+    @Override
+    public Optional<User> getUserByEmail (String email) {
+        return userRepository.findByEmail(email);
+    }
+
+
+
+    @Override
     public User createUser(User user) {
 
         portfolioRepository.save(new Portfolio(user));

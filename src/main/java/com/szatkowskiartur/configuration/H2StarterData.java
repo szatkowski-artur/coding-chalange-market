@@ -8,18 +8,18 @@ import com.szatkowskiartur.portfolio_entry.PortfolioEntryRepository;
 import com.szatkowskiartur.product.Product;
 import com.szatkowskiartur.product.ProductRepository;
 import com.szatkowskiartur.product.ProductType;
+import com.szatkowskiartur.role.Role;
+import com.szatkowskiartur.role.RoleRepository;
 import com.szatkowskiartur.user.User;
 import com.szatkowskiartur.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
 import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +29,8 @@ public class H2StarterData implements ApplicationRunner {
     private final PortfolioRepository portfolioRepository;
     private final ProductRepository productRepository;
     private final PortfolioEntryRepository portfolioEntryRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder encoder;
 
 
 
@@ -40,15 +42,30 @@ public class H2StarterData implements ApplicationRunner {
         Product btc = createProduct("btc");
         Product eth = createProduct("eth");
 
-        User user1 = createUser("1");
+        Role userRole = createRole("USER");
+        Role adminRole = createRole("ADMIN");
+
+        User user1 = createUser("1", userRole);
         Portfolio portfolio1 = createPortfolio(user1);
         createPortfolioEntry(portfolio1, btc, 0.0001234F);
         createPortfolioEntry(portfolio1, eth, 0.0890F);
 
-        User user2 = createUser("2");
+        User user2 = createUser("2", userRole);
         Portfolio portfolio2 = createPortfolio(user2);
         createPortfolioEntry(portfolio2, eth, 5.98731F);
 
+        User admin = createUser("_admin", adminRole);
+        admin.getRoles().add(userRole);
+        userRepository.save(admin);
+
+    }
+
+
+    public Role createRole (String name) {
+
+        Role role = new Role();
+        role.setName("ROLE_" + name);
+        return roleRepository.save(role);
 
     }
 
@@ -72,7 +89,10 @@ public class H2StarterData implements ApplicationRunner {
 
     public Portfolio createPortfolio(User user) {
 
-        return portfolioRepository.save(new Portfolio(user));
+        Portfolio portfolio = new Portfolio(user);
+        portfolio.setCreditUsd(1000.0);
+
+        return portfolioRepository.save(portfolio);
 
     }
 
@@ -96,7 +116,7 @@ public class H2StarterData implements ApplicationRunner {
 
 
 
-    public User createUser(String variable) {
+    public User createUser(String variable, Role role) {
 
         User user = new User();
 
@@ -105,8 +125,9 @@ public class H2StarterData implements ApplicationRunner {
         user.setSurname(String.format("surname%s", variable));
         user.setBirthday(LocalDate.of(1977, 2, 23));
         user.setEmail(String.format("email%s@email.com", variable));
-        user.setPassword(String.format("password%s", variable));
+        user.setPassword(encoder.encode("password"));
         user.setActive(true);
+        user.getRoles().add(role);
         return userRepository.save(user);
 
 

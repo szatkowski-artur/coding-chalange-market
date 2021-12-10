@@ -11,11 +11,13 @@ public class PortfolioDTO {
 
     private Long id;
 
-    private User owner;
+    private Long owner;
 
     private List<PortfolioEntry> products;
 
     private Double totalValue;
+
+    private Double creditUsd;
 
 
 
