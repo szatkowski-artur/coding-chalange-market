@@ -1,6 +1,5 @@
 package com.szatkowskiartur.portfolio_entry;
 
-import com.szatkowskiartur.portfolio.Portfolio;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

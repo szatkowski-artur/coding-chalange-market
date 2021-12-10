@@ -1,6 +1,5 @@
 package com.szatkowskiartur.product.elements;
 
-import com.szatkowskiartur.product.Product;
 import com.szatkowskiartur.product.ProductType;
 
 import java.lang.reflect.InvocationTargetException;

@@ -6,11 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
-import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
@@ -20,27 +16,7 @@ import javax.sql.DataSource;
         jsr250Enabled = true)
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private final DataSource dataSource;
-    private final PasswordEncoder encoder;
     private final CustomAuthenticationProvider authProvider;
-
-
-
-
-    @Override
-    public void configure (WebSecurity webSecurity) throws Exception {
-        webSecurity.ignoring().antMatchers("/h2-console", "/h2-console/**");
-    }
-
-
-
-
-    @Override
-    public void configure (AuthenticationManagerBuilder auth) throws Exception {
-
-        auth.authenticationProvider(authProvider);
-
-    }
 
 
 
@@ -50,8 +26,25 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests().anyRequest().authenticated()
-                .and()
-                .httpBasic();
+                .and().httpBasic();
+    }
+
+
+
+
+    @Override
+    public void configure (WebSecurity webSecurity) {
+        webSecurity.ignoring().antMatchers("/h2-console", "/h2-console/**");
+    }
+
+
+
+
+    @Override
+    public void configure (AuthenticationManagerBuilder auth) {
+
+        auth.authenticationProvider(authProvider);
+
     }
 
 

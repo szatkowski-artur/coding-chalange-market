@@ -1,7 +1,6 @@
 package com.szatkowskiartur.portfolio;
 
 import com.szatkowskiartur.portfolio_entry.PortfolioEntry;
-import com.szatkowskiartur.user.User;
 import lombok.Data;
 
 import java.util.List;

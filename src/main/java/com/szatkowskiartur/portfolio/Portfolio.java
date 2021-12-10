@@ -28,7 +28,7 @@ public class Portfolio {
     private User owner;
 
     @OneToMany (fetch = FetchType.EAGER, mappedBy = "portfolio", cascade = CascadeType.REMOVE)
-//    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
+    @Cascade(org.hibernate.annotations.CascadeType.REMOVE)
     private List<PortfolioEntry> products;
 
     private Double creditUsd = 0.0;

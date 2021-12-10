@@ -3,7 +3,6 @@ package com.szatkowskiartur.configuration;
 import com.szatkowskiartur.user.User;
 import com.szatkowskiartur.user.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
