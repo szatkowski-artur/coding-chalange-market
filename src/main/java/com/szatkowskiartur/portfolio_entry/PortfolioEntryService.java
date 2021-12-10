@@ -6,7 +6,7 @@ import java.util.Optional;
 
 public interface PortfolioEntryService {
 
-    void addPortfolioEntry(PortfolioEntry portfolioEntry);
+    void savePortfolioEntry (PortfolioEntry portfolioEntry);
 
 
     Optional<PortfolioEntry> getPortfolioEntryByPortfolioAndProduct(Long portfolioId, Long productId);

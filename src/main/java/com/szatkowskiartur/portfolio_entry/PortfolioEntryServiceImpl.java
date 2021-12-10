@@ -13,7 +13,7 @@ public class PortfolioEntryServiceImpl implements PortfolioEntryService {
     private final PortfolioEntryRepository portfolioEntryRepository;
 
     @Override
-    public void addPortfolioEntry(PortfolioEntry portfolioEntry) {
+    public void savePortfolioEntry (PortfolioEntry portfolioEntry) {
         portfolioEntryRepository.save(portfolioEntry);
     }
 

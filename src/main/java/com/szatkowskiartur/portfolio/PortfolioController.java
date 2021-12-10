@@ -1,53 +1,39 @@
 package com.szatkowskiartur.portfolio;
 
 import com.szatkowskiartur.exception.NotEnoughCreditException;
+import com.szatkowskiartur.exception.NotEnoughProductAmountException;
 import com.szatkowskiartur.exception.NotFoundException;
 import com.szatkowskiartur.user.User;
+import com.szatkowskiartur.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import static com.szatkowskiartur.utlis.Utils.*;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/portfolio")
+@RequestMapping ("/portfolio")
 public class PortfolioController {
 
     public final PortfolioServiceImpl portfolioService;
     public final ModelMapper mapper;
-
-
-    @GetMapping("/id/{id}")
-    public ResponseEntity<PortfolioDTO> getportfolioById(@PathVariable Long id) {
-
-        Optional<Portfolio> portfolioDb = portfolioService.getPortfolioById(id);
-
-        if (portfolioDb.isEmpty())
-            throw new NotFoundException("Portfolio not found");
-
-
-        return new ResponseEntity<>(mapper.map(portfolioDb.get(), PortfolioDTO.class), HttpStatus.OK);
-
-    }
+    private final UserService userService;
 
 
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<PortfolioDTO> getPortfolioForUser(@PathVariable Long id) {
-
-        //todo Set up security
-//        User user = (User) SecurityContextHolder.getContext().getAuthentication().getDetails();
+    @GetMapping
+    public ResponseEntity<PortfolioDTO> getPortfolioForUser (Principal principal) {
 
 
-        Optional<Portfolio> portfolioDb = portfolioService.getPortfolioByUser(id);
+        Optional<Portfolio> portfolioDb = portfolioService.getPortfolioForUser(
+                getCurrentSessionUserId(principal));
 
         if (portfolioDb.isEmpty())
             throw new NotFoundException("This user does not have an active portfolio");
@@ -58,10 +44,23 @@ public class PortfolioController {
     }
 
 
-    @PostMapping("/{id}/buy")
-    public ResponseEntity<String> buyProduct(@PathVariable Long id, @RequestParam Long productId, @RequestParam Float amount) throws NotEnoughCreditException {
 
-        portfolioService.buyProduct(id, productId, amount);
+
+    @PostMapping ("/sell")
+    public ResponseEntity<String> sellProduct (Principal principal, @RequestParam Long productId, @RequestParam Float amount) throws NotEnoughProductAmountException {
+
+        portfolioService.sellProduct(getCurrentSessionUserId(principal), productId, amount);
+
+        return new ResponseEntity<>(createJsonWithMessage("Sell successful"), HttpStatus.OK);
+    }
+
+
+
+
+    @PostMapping ("/buy")
+    public ResponseEntity<String> buyProduct (Principal principal, @RequestParam Long productId, @RequestParam Float amount) throws NotEnoughCreditException {
+
+        portfolioService.buyProduct(getCurrentSessionUserId(principal), productId, amount);
 
         return new ResponseEntity<>(createJsonWithMessage("Purchase successful"), HttpStatus.OK);
 
@@ -70,8 +69,20 @@ public class PortfolioController {
 
 
 
-    @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<String> handleNotFoundException(NotFoundException exception) {
+    private Long getCurrentSessionUserId (Principal principal) {
+        Optional<User> userDb = userService.getUserByEmail(principal.getName());
+
+        if (userDb.isEmpty())
+            throw new NotFoundException("User does not exist");
+
+        return userDb.get().getId();
+    }
+
+
+
+
+    @ExceptionHandler (NotFoundException.class)
+    public ResponseEntity<String> handleNotFoundException (NotFoundException exception) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -79,8 +90,23 @@ public class PortfolioController {
 
     }
 
-    @ExceptionHandler(NotEnoughCreditException.class)
-    public ResponseEntity<String> handleNotEnoughCredit(NotEnoughCreditException exception) {
+
+
+
+    @ExceptionHandler (NotEnoughCreditException.class)
+    public ResponseEntity<String> handleNotEnoughCreditException (NotEnoughCreditException exception) {
+
+        return ResponseEntity
+                .status(HttpStatus.NOT_ACCEPTABLE)
+                .body(createJsonWithMessage(exception.getMessage()));
+
+    }
+
+
+
+
+    @ExceptionHandler (NotEnoughProductAmountException.class)
+    public ResponseEntity<String> handleNotEnoughAmountException (NotEnoughProductAmountException exception) {
 
         return ResponseEntity
                 .status(HttpStatus.NOT_ACCEPTABLE)

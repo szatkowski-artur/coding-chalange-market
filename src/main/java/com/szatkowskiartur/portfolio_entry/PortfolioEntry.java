@@ -1,15 +1,13 @@
 package com.szatkowskiartur.portfolio_entry;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.szatkowskiartur.portfolio.Portfolio;
 import com.szatkowskiartur.product.Product;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
-
+//todo Change to correct implementation https://stackoverflow.com/questions/23837561/jpa-2-0-many-to-many-with-extra-column
 @Entity
 @Data
 @EqualsAndHashCode (of = "id")

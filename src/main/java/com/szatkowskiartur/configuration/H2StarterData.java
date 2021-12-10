@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-
+//todo try with CommandLineRunner
 @Component
 @RequiredArgsConstructor
 public class H2StarterData implements ApplicationRunner {
@@ -37,7 +37,7 @@ public class H2StarterData implements ApplicationRunner {
 
     @Override
     @Transactional
-    public void run(ApplicationArguments args) throws Exception {
+    public void run(ApplicationArguments args) {
 
         Product btc = createProduct("btc");
         Product eth = createProduct("eth");
